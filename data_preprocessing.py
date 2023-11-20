@@ -1,90 +1,53 @@
-def read_documents():
-    f = open("INSERT PATH") # file is accessed locally
-    merged = ""
+import os
+import spacy
+from spacy.cli import download
 
-    for a_line in f.readlines():
-        if a_line.startswith("."):
-            merged += "\n" + a_line.strip()
-        else:
-            merged += " " + a_line.strip()
+download("en_core_web_sm")
+nlp = spacy.load("en_core_web_sm")
 
-    documents = {}
+def read_reviews(folder_path):
+    reviews = {}
 
-    content = ""
-    doc_id = ""
+    for filename in os.listdir(folder_path): # Retrieves all reviews files in directory
+        file_path = os.path.join(folder_path, filename)
 
-    for a_line in merged.split("\n"):
-        if a_line.startswith(".I"):
-            doc_id = a_line.split(" ")[1].strip()
-        elif a_line.startswith(".X"):
-            documents[doc_id] = content
-            content = ""
-            doc_id = ""
-        else:
-            content += a_line.strip()[3:] + " "
-    f.close()
-    return documents
+        if os.path.isfile(file_path):
+            with open(file_path, 'r', encoding='utf-8') as file:
+                content = file.read()
 
-documents = read_documents()
-print(f"{len(documents)} documents in total")
-print("Document with id 1:")
-print(documents.get("1"))
+                # Extract star rating from filename (id_star.txt format)
+                star_rating = int(filename.split('_')[-1].split('.')[0])
+                # Assign labels given extracted star rating
+                label = 1 if star_rating >= 7 else 0
 
-def read_queries():
-    #f = open("cisi/CISI.QRY") # same as above; use a different command if running in Colab
-    f = open("/content/drive/MyDrive/" + "Colab Notebooks/" + "cisi/CISI.QRY") #if via Colab
-    merged = ""
+                # Apply preprocessing on review content
+                tokens = preprocess_review(content)
 
-    for a_line in f.readlines():
-        if a_line.startswith("."):
-            merged += "\n" + a_line.strip()
-        else:
-            merged += " " + a_line.strip()
+                # Assign each review a dictionary of label and preprocessed content
+                reviews[filename] = {'label': label, 'content': tokens}
 
-    queries = {}
+    return reviews
 
-    content = ""
-    qry_id = ""
+def preprocess_review(content):
+    # Process content using Spacy NLP pipeline
+    # Includes tokenization, stopwords flag, lemmatized token
+    doc = nlp(content)
 
-    for a_line in merged.split("\n"):
-        if a_line.startswith(".I"):
-            if not content=="":
-                queries[qry_id] = content
-                content = ""
-                qry_id = ""
-            qry_id = a_line.split(" ")[1].strip()
-        elif a_line.startswith(".W") or a_line.startswith(".T"):
-            content += a_line.strip()[3:] + " "
-    queries[qry_id] = content
-    f.close()
-    return queries
+    # Apply tokenization, remove stopwords, lemmatization
+    tokens = [token.lemma_ for token in doc if not token.is_stop]
+    
+    return tokens
 
-queries = read_queries()
-print(f"{len(queries)} queries in total")
-print("Query with id 1:")
-print(queries.get("1"))
+# Read positive and negative reviews
+pos_reviews = read_reviews('../data/pos') 
+neg_reviews = read_reviews('../data/neg')  
 
-def read_mappings():
-    #f = open("cisi/CISI.REL") # different command if running in Colab; see above
-    f = open("/content/drive/MyDrive/" + "Colab Notebooks/" + "cisi/CISI.REL") #if via Colab
+# Print a specific review
+print(f"{len(pos_reviews)} positive reviews in total")
+print(pos_reviews['13_7.txt'])
 
-    mappings = {}
-
-    for a_line in f.readlines():
-        voc = a_line.strip().split()
-        key = voc[0].strip()
-        current_value = voc[1].strip()
-        value = []
-        if key in mappings.keys():
-            value = mappings.get(key)
-        value.append(current_value)
-        mappings[key] = value
-
-    f.close()
-    return mappings
-
-mappings = read_mappings()
-print(f"{len(mappings)} mappings in total")
-print(mappings.keys())
-print("Mapping for query with id 1:")
-print(mappings.get("1"))
+# Generate 3 sets of features 
+# 1: stopwords, lemmatization, TFIDF
+# 2: stopwords, stemming, TFIDF
+# 3: stopwords, lemmatiazation
+# 4: CONSIDER OTHER SETS OF FEATURES (e.g. no stopwords, no punctuation)
