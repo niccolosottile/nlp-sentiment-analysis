@@ -1,13 +1,23 @@
-A Sentiment Analysis NLP pipeline built on a dataset of 4000 movie reviews. Includes Naive Bayes Classifier, SGD Logistic Regression, SVM, and BERT models.
+# Sentiment Analysis NLP Pipeline
 
-Below is an overview of the file structure and the purpose of each file:
+This project presents a Sentiment Analysis pipeline built on a dataset of 4000 movie reviews. It encompasses a variety of models including a Naive Bayes Classifier, SGD Logistic Regression, SVM, and BERT.
 
-entire_pipeline.ipynb: This Jupyter notebook contains the complete pipeline for evaluating various models (excluding BERT). It also includes the process for hyperparameter optimization of the SVM model using grid search.
+## File Structure Overview
 
-bert.ipynb: Dedicated to the BERT model, this notebook implements the pipeline using both the base uncased and cased versions of BERT.
+- **`entire_pipeline.ipynb`**: 
+  - This Jupyter notebook encapsulates the complete pipeline for evaluating various models, excluding BERT. 
+  - It includes the process for hyperparameter optimization of the SVM model using grid search.
 
-read_and_preprocess.py: A Python script responsible for reading .txt files, assigning labels based on extracted ratings from file names, and applying various preprocessing steps. These steps may include the removal of stopwords and punctuation, as well as the application of stemming and lemmatization techniques.
+- **`bert.ipynb`**: 
+  - Focused on the BERT model, this notebook employs both the base uncased and cased versions of BERT for the analysis.
 
-tfidf.py: Contains a custom implementation of the Term Frequency-Inverse Document Frequency (TF-IDF) algorithm.
+- **`read_and_preprocess.py`**: 
+  - A Python script for reading `.txt` files and assigning labels based on extracted ratings from filenames. 
+  - It implements preprocessing steps such as the removal of stopwords and punctuation, and the application of stemming and lemmatization techniques.
 
-naive_bayes.py: Contains a custom implementation of the Naive Bayes Classifier.
+- **`tfidf.py`**: 
+  - Features a custom implementation of the Term Frequency-Inverse Document Frequency (TF-IDF) algorithm.
+
+- **`naive_bayes.py`**: 
+  - Contains a custom implementation of the Naive Bayes Classifier.
+
