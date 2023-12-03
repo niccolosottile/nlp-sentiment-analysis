@@ -15,7 +15,7 @@ nltk.download('wordnet')
 nltk.download('averaged_perceptron_tagger')
 
 def read_reviews(folder_path):
-    """Reads the reviews in the folder path, storing label (derived from star rating) and content in a dictionary."""
+    """Reads the reviews in the folder path, storing label and content in a dictionary."""
     reviews = {}
 
     # Retrieve all review files in directory
@@ -73,21 +73,24 @@ def preprocess_reviews(contents, a_stopwords = False, a_punctuation = False, a_s
         # Apply tokenization
         tokens = nltk.word_tokenize(content)
 
-        # Apply preprocessing based on criteria supplied
+        # Apply stemming, lemmatization, or nothing
         if a_stemming:
-            preprocessed_tokens = [stemmer.stem(token.lower()) for token in tokens if verify_stopwords_punctuation(token, a_stopwords, a_punctuation)]
+            preprocessed_tokens = [stemmer.stem(token.lower()) for token in tokens \
+                if verify_stopwords_punctuation(token, a_stopwords, a_punctuation)]
         elif a_lemmatization:
             pos_tags = nltk.pos_tag(tokens)
-            preprocessed_tokens = [lemmatizer.lemmatize(token, get_wordnet_pos(pos)).lower() for token, pos in pos_tags if verify_stopwords_punctuation(token, a_stopwords, a_punctuation)]
+            preprocessed_tokens = [lemmatizer.lemmatize(token, get_wordnet_pos(pos)).lower() for token, pos in pos_tags \
+                if verify_stopwords_punctuation(token, a_stopwords, a_punctuation)]
         else:
-            preprocessed_tokens = [token.lower() for token in tokens if verify_stopwords_punctuation(token, a_stopwords, a_punctuation)]
+            preprocessed_tokens = [token.lower() for token in tokens \
+                if verify_stopwords_punctuation(token, a_stopwords, a_punctuation)]
 
         # Generate n-grams (treating them as units due to _)
         preprocessed_n_grams = []
 
         for i in range(1, n_gram_size + 1):
             n_grams = list(ngrams(preprocessed_tokens, i))
-
+            
             for n_gram in n_grams:
                 preprocessed_n_grams.append('_'.join(n_gram))
 
